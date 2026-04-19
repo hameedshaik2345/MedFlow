@@ -145,7 +145,7 @@ export default function PatientDashboard() {
   const upcomingList = appointments.filter(a => ['confirmed', 'pending', 'billed'].includes(a.status));
   const historyList = appointments.filter(a => ['completed', 'paid', 'cancelled'].includes(a.status));
 
-  let currentViewList = [];
+  let currentViewList: any[] = [];
   if (activeTab === 'manage') currentViewList = upcomingList;
   else if (activeTab === 'history') currentViewList = historyList;
 
@@ -240,9 +240,9 @@ export default function PatientDashboard() {
                   <Calendar className="text-gray-300 w-8 h-8" />
                 </div>
                 <p className="text-gray-500 font-bold">No active doctor visits scheduled today.</p>
-                <Link to="/book-appointment">
+                <a href="/book-appointment">
                   <Button className="mt-6 bg-[#1877F2] hover:bg-[#1565D8] px-8 font-bold shadow-lg shadow-blue-500/20">Book a New Booking</Button>
-                </Link>
+                </a>
             </div>
           ) : (
             <div className="bg-white p-6 rounded-xl border border-blue-100 bg-blue-50/30 shadow-sm flex items-center justify-between border-l-4 border-l-blue-500">

@@ -10,6 +10,9 @@ export interface User {
   specialty?: string;
   department?: string;
   experienceYears?: number;
+  address?: string;
+  liveStatus?: string;
+  currentToken?: number;
 }
 
 interface AuthContextType {

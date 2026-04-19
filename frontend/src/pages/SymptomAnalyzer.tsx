@@ -153,7 +153,7 @@ export default function SymptomAnalyzer() {
                   {results.doctors.map(doc => {
                     const hospital = normalizeHospitalName(doc.address);
                     const coords = getHospitalCoordinates(hospital);
-                    let distance = null;
+                    let distance: string | null = null;
                     if (userLocation) {
                       distance = calculateDistance(userLocation.lat, userLocation.lng, coords.lat, coords.lng);
                     }

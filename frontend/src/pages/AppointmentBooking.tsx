@@ -462,8 +462,8 @@ export default function AppointmentBooking() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center border-b pb-2"><User className="w-5 h-5 mr-2"/> Patient Details</h3>
-                <p className="mb-2"><span className="text-gray-500 font-medium">Name:</span> <span className="font-semibold ml-2">{user.name}</span></p>
-                <p className="mb-2"><span className="text-gray-500 font-medium">Email:</span> <span className="font-semibold ml-2">{user.email}</span></p>
+                <p className="mb-2"><span className="text-gray-500 font-medium">Name:</span> <span className="font-semibold ml-2">{user?.name}</span></p>
+                <p className="mb-2"><span className="text-gray-500 font-medium">Email:</span> <span className="font-semibold ml-2">{user?.email}</span></p>
                 {reason && <p className="mb-2"><span className="text-gray-500 font-medium">Reason:</span> <span className="font-semibold ml-2">{reason}</span></p>}
               </div>
 
@@ -527,8 +527,8 @@ export default function AppointmentBooking() {
                  <div className="grid md:grid-cols-2 gap-8">
                     <div>
                       <h4 className="font-bold text-gray-900 mb-4 flex items-center text-lg"><User className="w-5 h-5 mr-2 text-primary"/> Patient</h4>
-                      <p className="text-gray-600 mb-1">{user.name}</p>
-                      <p className="text-gray-600 mb-1">{user.email}</p>
+                      <p className="text-gray-600 mb-1">{user?.name}</p>
+                      <p className="text-gray-600 mb-1">{user?.email}</p>
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 mb-4 flex items-center text-lg"><MapPin className="w-5 h-5 mr-2 text-primary"/> Hospital & Doctor</h4>

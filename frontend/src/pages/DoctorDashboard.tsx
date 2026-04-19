@@ -135,7 +135,7 @@ export default function DoctorDashboard() {
   const active = appointments.filter(a => a.status === 'confirmed');
   const completed = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
 
-  let currentViewList = [];
+  let currentViewList: any[] = [];
   if (activeTab === 'manage') currentViewList = [...active, ...pending];
   else if (activeTab === 'history') currentViewList = completed;
 
