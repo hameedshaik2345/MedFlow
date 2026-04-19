@@ -1,0 +1,13 @@
+node_modules/
+.env
+dist/
+build/
+.DS_Store
+*.log
+backend/scratch/
+frontend/scratch/
+backend/dist/
+frontend/dist/
+frontend/build/
+.gemini/
+antigravity/
