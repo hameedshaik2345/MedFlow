@@ -31,6 +31,22 @@ router.post("/live_status/increment", authenticateJWT, authorizeRole("doctor"), 
   }
 });
 
+// Reset current token to zero
+router.post("/live_status/reset", authenticateJWT, authorizeRole("doctor"), async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) return;
+    const doctor = await User.findById(req.user.id);
+    if (!doctor) { res.status(404).json({ message: "Doctor not found" }); return; }
+    
+    doctor.currentToken = 0;
+    await doctor.save();
+    
+    res.json({ success: true, current_token: 0 });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to reset token", error });
+  }
+});
+
 // Update live status
 router.post("/live_status/update", authenticateJWT, authorizeRole("doctor"), async (req: Request, res: Response): Promise<void> => {
   try {

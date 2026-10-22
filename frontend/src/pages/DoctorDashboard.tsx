@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { RefreshCw, MapPin, X, CheckCircle, Pill, Search } from 'lucide-react';
+import { RefreshCw, RotateCcw, MapPin, X, CheckCircle, Pill, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -89,6 +89,28 @@ export default function DoctorDashboard() {
     }
   };
 
+  const resetLiveToken = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/doctors/live_status/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        toast.success("Live token reset to 0!");
+        const data = await res.json();
+        updateUser({ currentToken: data.current_token } as any);
+      } else {
+        toast.error("Failed to reset token");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to reset token");
+    }
+  };
+
   const handleUpdateLiveStatus = async (status: string) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/doctors/live_status/update`, {
@@ -172,9 +194,14 @@ export default function DoctorDashboard() {
                      <p className="text-xs uppercase tracking-wider text-blue-200">Current Token</p>
                      <p className="text-5xl font-bold">#{(user as any)?.currentToken || 0}</p>
                    </div>
-                   <Button onClick={incrementLiveToken} className="bg-white text-[#0066CC] hover:bg-blue-50 ml-auto mr-4 shadow-lg active:scale-95 transition-all">
-                     Call Next Token (+1)
-                   </Button>
+                   <div className="ml-auto flex items-center gap-2">
+                     <Button onClick={incrementLiveToken} className="bg-white text-[#0066CC] hover:bg-blue-50 shadow-lg active:scale-95 transition-all">
+                       Call Next Token (+1)
+                     </Button>
+                     <Button onClick={resetLiveToken} variant="outline" className="bg-white/15 hover:bg-white/25 text-white border-white/30 shadow-sm active:scale-95 transition-all">
+                       <RotateCcw className="w-4 h-4 mr-1.5" /> Reset to 0
+                     </Button>
+                   </div>
                  </div>
                  <p className="text-xs text-blue-100 mt-4">Calling next token automatically updates patient views.</p>
                </div>
