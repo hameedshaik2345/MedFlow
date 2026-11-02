@@ -13,13 +13,9 @@ dotenv.config();
 
 const router = express.Router();
 const secretKey = process.env.JWT_SECRET || 'vishalsaigodavari';
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-
-if (!googleClientId) {
-  console.warn('Warning: GOOGLE_CLIENT_ID is not set in environment variables');
-}
-
-const client = googleClientId ? new OAuth2Client(googleClientId) : null;
+const DEFAULT_GOOGLE_CLIENT_ID = '419601703152-6c32v50v1b5l32k5dat1qudl8krre865.apps.googleusercontent.com';
+const googleClientId = process.env.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(googleClientId);
 
 // Google OAuth Routes
 router.get('/google',
