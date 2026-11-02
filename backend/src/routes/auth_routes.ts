@@ -201,57 +201,49 @@ router.post('/register', async (req: Request, res: Response) => {
 
     let user = await User.findOne({ email });
     if (user) {
-      if (!user.isEmailVerified) {
-         // Existing unverified user from legacy signups, delete them so they go 
-         // into PendingUser collection with their new signup credentials
-         await User.deleteOne({ email });
-      } else {
-         return res.status(400).json({ message: 'User already exists' });
-      }
+      return res.status(400).json({ message: 'User already exists' });
     }
 
     // Determine initial approval status based on role
-    // Admins and regular patients might be auto-approved, while doctors/pharmacists might not be.
+    // Admins and regular patients are auto-approved
     const isApproved = role === 'admin' || role === 'patient';
 
-    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-
-    const userData = {
+    user = new User({
       name,
       email,
       password,
       role,
       isApproved,
-      isEmailVerified: false,
+      isEmailVerified: true, // auto-verified, no OTP needed
       specialization: (role === 'mentor' || role === 'guide') ? specialization : undefined,
       phone,
-    };
+    });
 
-    let pendingUser = await PendingUser.findOne({ email });
-    if (pendingUser) {
-      pendingUser.userData = userData;
-      pendingUser.emailOtp = otp;
-      pendingUser.createdAt = new Date(); // reset expiration
-      await pendingUser.save();
-    } else {
-      pendingUser = new PendingUser({
-        email,
-        userData,
-        emailOtp: otp,
-      });
-      await pendingUser.save();
-    }
+    await user.save();
 
-    await sendEmail(email, otp);
+    const jwtToken = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      secretKey,
+      { expiresIn: '1d' }
+    );
 
     res.status(201).json({
-      message: 'OTP sent to email. Please verify.',
-      requireOtp: true,
-      email,
+      message: 'Registration successful',
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isApproved: user.isApproved,
+        specialization: user.specialization,
+        currentToken: user.currentToken,
+        liveStatus: user.liveStatus
+      },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: error.message || 'Server error during registration' });
   }
 });
 
@@ -376,13 +368,8 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     if (!user.isEmailVerified) {
-       // If user tries to login but not verified, ask for OTP
-       const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-       user.emailOtp = otp;
-       user.emailOtpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+       user.isEmailVerified = true;
        await user.save();
-       await sendEmail(email, otp);
-       return res.status(403).json({ message: 'Account not verified. A new OTP has been sent to your email.', requireOtp: true, email: user.email });
     }
 
     const jwtToken = jwt.sign(

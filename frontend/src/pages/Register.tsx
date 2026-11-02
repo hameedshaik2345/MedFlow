@@ -55,20 +55,17 @@ export default function Register() {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Proceed to OTP
-      if (data.requireOtp) {
-        toast.success(data.message || 'Verification OTP sent to your email');
-        router.navigate({ to: '/verify-otp', search: { email } } as any);
-        return;
+      if (data.token && data.user) {
+        login(data.token, data.user);
+        toast.success(data.message || 'Successfully registered');
+        const registeredRole = data.user.role;
+        if (registeredRole === 'admin') router.navigate({ to: '/admin/appointments' });
+        else if (registeredRole === 'doctor') router.navigate({ to: '/doctor-dashboard' });
+        else router.navigate({ to: '/patient-dashboard' });
+      } else {
+        toast.success(data.message || 'Successfully registered! Please sign in.');
+        router.navigate({ to: '/login' } as any);
       }
-
-      // Auto login fallback (Though usually it hits OTP above)
-      login(data.token, data.user);
-      toast.success(data.message || 'Successfully registered');
-      const registeredRole = data.user.role;
-      if (registeredRole === 'admin') router.navigate({ to: '/admin/appointments' });
-      else if (registeredRole === 'doctor') router.navigate({ to: '/doctor-dashboard' });
-      else router.navigate({ to: '/patient-dashboard' });
       
     } catch (err: any) {
       console.error(err);

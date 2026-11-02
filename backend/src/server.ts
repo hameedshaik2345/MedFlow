@@ -47,6 +47,25 @@ app.use(passport.session());
 
 app.use(express.json());
 
+const DEFAULT_MONGO_URI = "mongodb+srv://vishalsaigodavari:hicAAlzK1T9Y8Tff@cluster0.wpsivyj.mongodb.net/MedFlow?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI || DEFAULT_MONGO_URI;
+
+// Ensure database connection middleware for serverless invocations
+let isConnected = false;
+app.use(async (_req, _res, next) => {
+  if (mongoose.connection.readyState >= 1) {
+    return next();
+  }
+  try {
+    await mongoose.connect(MONGO_URI);
+    isConnected = true;
+    next();
+  } catch (err) {
+    console.error("MongoDB connection error in middleware:", err);
+    next();
+  }
+});
+
 // Routes
 import appointmentRoutes from "./routes/appointment_routes";
 import doctorRoutes from "./routes/doctor_routes";
@@ -61,17 +80,12 @@ app.use("/api/doctors", doctorRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/symptoms", symptomRoutes);
 
-
-
 const PORT = process.env.PORT || 3000;
 
 mongoose
-  .connect(process.env.MONGO_URI!)
+  .connect(MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
-    // Initialize cron jobs
-
-    
     // Only listen if not running on Vercel (Vercel handles the serverless connection)
     if (process.env.VERCEL !== '1') {
       app.listen(PORT, () => {
@@ -79,6 +93,6 @@ mongoose
       });
     }
   })
-  .catch((err) => console.error(err));
+  .catch((err) => console.error("Initial MongoDB connection error:", err));
 
 export default app;
